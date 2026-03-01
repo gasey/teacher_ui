@@ -1,11 +1,29 @@
+import { useEffect, useState } from "react";
 import { MdDashboard } from "react-icons/md";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import api from "../api/apiClient";
 import logo from "../assets/Shiksha.svg";
 import "../styles/sidebar.css";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const [classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    async function fetchClasses() {
+      try {
+        const res = await api.get(
+          "/courses/teacher/my-classes/"
+        );
+        setClasses(res.data);
+      } catch (err) {
+        console.error("Failed to load teacher classes", err);
+      }
+    }
+
+    fetchClasses();
+  }, []);
 
   return (
     <aside className="sidebar">
@@ -18,7 +36,10 @@ export default function Sidebar() {
       </div>
 
       <nav>
-        <div className="menu-item" onClick={() => navigate("/teacher/dashboard")}>
+        <div
+          className="menu-item"
+          onClick={() => navigate("/teacher/dashboard")}
+        >
           <MdDashboard />
           <span>Dashboard</span>
         </div>
@@ -29,8 +50,22 @@ export default function Sidebar() {
         </div>
 
         <div className="submenu">
-          <p onClick={() => navigate("/teacher/classes/math-8-by23")}>Math (Class 8) BY23</p>
-          <p onClick={() => navigate("/teacher/classes/math-8-by26")}>Math (Class 8) BY26</p>
+          {classes.length === 0 && (
+            <p style={{ opacity: 0.6 }}>No classes</p>
+          )}
+
+          {classes.map((cls) => (
+            <p
+              key={cls.subject_id + cls.batch_code}
+              onClick={() =>
+                navigate(
+                  `/teacher/classes/${cls.subject_id}/${cls.batch_code}`
+                )
+              }
+            >
+              {cls.subject_name} ({cls.course_title}) {cls.batch_code}
+            </p>
+          ))}
         </div>
       </nav>
     </aside>
