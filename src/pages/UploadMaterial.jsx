@@ -21,6 +21,7 @@ export default function UploadMaterial() {
   };
 
   const handleFileChange = (e) => {
+
     const selected = Array.from(e.target.files || []);
 
     if (selected.length > 0) {
@@ -28,14 +29,10 @@ export default function UploadMaterial() {
     }
 
     e.target.value = "";
+
   };
 
   const handleUpload = async () => {
-
-    if (!subjectId) {
-      console.error("Missing subjectId in URL");
-      return;
-    }
 
     if (!title.trim()) {
       alert("Please enter a title");
@@ -69,7 +66,10 @@ export default function UploadMaterial() {
       );
 
       alert("Upload successful");
-      navigate(-1);
+
+      navigate(
+        `/teacher/classes/${subjectId}/study-materials`
+      );
 
     } catch (err) {
 
@@ -118,9 +118,7 @@ export default function UploadMaterial() {
 
           <div className="um-field">
 
-            <label className="um-label">
-              Title
-            </label>
+            <label className="um-label">Title</label>
 
             <input
               type="text"
@@ -144,11 +142,9 @@ export default function UploadMaterial() {
             <div className="um-file-list">
 
               {files.map((f, i) => (
-
                 <span key={i} className="um-file-name">
                   {f.name}
                 </span>
-
               ))}
 
             </div>

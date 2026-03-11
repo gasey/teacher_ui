@@ -14,14 +14,8 @@ export default function StudyMaterials() {
   const [materials, setMaterials] = useState([]);
 
   useEffect(() => {
-
-    if (!subjectId) {
-      console.error("subjectId missing in URL");
-      return;
-    }
-
+    if (!subjectId) return;
     loadMaterials();
-
   }, [subjectId]);
 
   const loadMaterials = async () => {
@@ -36,7 +30,7 @@ export default function StudyMaterials() {
 
     } catch (err) {
 
-      console.error("Failed to load materials", err);
+      console.error("Failed to load materials:", err);
 
     }
 
@@ -44,9 +38,13 @@ export default function StudyMaterials() {
 
   const handleDelete = async (id) => {
 
+    if (!window.confirm("Delete this material?")) return;
+
     try {
 
-      await api.delete(`/materials/${id}/`);
+      await api.delete(
+        `/materials/classes/${subjectId}/materials/${id}/`
+      );
 
       setMaterials((prev) =>
         prev.filter((m) => m.id !== id)
@@ -54,7 +52,7 @@ export default function StudyMaterials() {
 
     } catch (err) {
 
-      console.error("Delete failed", err);
+      console.error("Delete failed:", err);
 
     }
 
@@ -62,12 +60,9 @@ export default function StudyMaterials() {
 
   const handleAddMaterial = () => {
 
-    if (!subjectId) {
-      console.error("Cannot navigate: subjectId missing");
-      return;
-    }
-
-    navigate(`/teacher/classes/${subjectId}/study-materials/upload`);
+    navigate(
+      `/teacher/classes/${subjectId}/study-materials/upload`
+    );
 
   };
 
@@ -110,18 +105,9 @@ export default function StudyMaterials() {
 
         <div className="sm-table-header">
 
-          <span className="sm-col-name">
-            Name
-          </span>
-
-          <span className="sm-col-date">
-            Date
-          </span>
-
-          <span className="sm-col-files">
-            Files
-          </span>
-
+          <span className="sm-col-name">Name</span>
+          <span className="sm-col-date">Date</span>
+          <span className="sm-col-files">Files</span>
           <span className="sm-col-actions"></span>
 
         </div>
@@ -138,10 +124,7 @@ export default function StudyMaterials() {
 
             {materials.map((material) => (
 
-              <div
-                className="sm-row"
-                key={material.id}
-              >
+              <div className="sm-row" key={material.id}>
 
                 <span className="sm-col-name">
                   {material.title}
