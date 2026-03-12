@@ -15,6 +15,7 @@ export default function UploadRecording() {
   const [timing, setTiming] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -23,17 +24,33 @@ export default function UploadRecording() {
   };
 
   const handleFileChange = (e) => {
+
     if (e.target.files.length > 0) {
       setVideoFile(e.target.files[0]);
     }
+
     e.target.value = "";
   };
 
   const handleUpload = async () => {
 
-    if (!topic.trim() || !videoFile) return;
+    console.log("Upload clicked");
+
+    if (!topic.trim()) {
+      alert("Please enter a topic/title");
+      return;
+    }
+
+    if (!videoFile) {
+      alert("Please attach a video file");
+      return;
+    }
 
     try {
+
+      setUploading(true);
+
+      console.log("Creating Bunny video slot...");
 
       // 1️⃣ Ask Django to create Bunny video slot
       const res = await api.post(
@@ -43,7 +60,9 @@ export default function UploadRecording() {
 
       const videoId = res.data.video_id;
 
-      // 2️⃣ Upload video directly to Bunny
+      console.log("Video slot created:", videoId);
+
+      // 2️⃣ Upload video to Bunny
       const uploadUrl =
         `https://video.bunnycdn.com/library/615730/videos/${videoId}`;
 
@@ -75,6 +94,14 @@ export default function UploadRecording() {
 
       xhr.onload = async () => {
 
+        console.log("Upload finished");
+
+        if (xhr.status !== 200 && xhr.status !== 201) {
+          alert("Upload failed");
+          setUploading(false);
+          return;
+        }
+
         // 3️⃣ Save metadata in Django
         await api.post(
           `/courses/subjects/${subjectId}/recordings/save/`,
@@ -86,42 +113,57 @@ export default function UploadRecording() {
           }
         );
 
+        console.log("Recording saved");
+
         navigate(-1);
       };
 
       xhr.onerror = () => {
-        console.error("Upload failed");
+        alert("Upload failed");
+        setUploading(false);
       };
 
       xhr.send(videoFile);
 
     } catch (err) {
+
       console.error(err);
+      alert("Something went wrong");
+
+      setUploading(false);
     }
   };
 
   return (
+
     <div className="ur-page">
 
-      <button className="ur-back-btn" onClick={() => navigate(-1)}>
+      <button
+        className="ur-back-btn"
+        onClick={() => navigate(-1)}
+      >
         <IoChevronBack /> Back
       </button>
 
       <div className="ur-title-container">
+
         <h2 className="ur-title">Mathematics</h2>
 
         <div className="ur-search">
           <input type="text" placeholder="Search" />
           <FiSearch className="ur-search-icon" />
         </div>
+
       </div>
 
       <div className="ur-form-container">
+
         <div className="ur-form-card">
 
           <h3 className="ur-form-heading">Add Recording</h3>
 
           <div className="ur-field">
+
             <label className="ur-label">Topic/Title</label>
 
             <input
@@ -131,9 +173,11 @@ export default function UploadRecording() {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
             />
+
           </div>
 
           <div className="ur-field">
+
             <label className="ur-label">Session Date</label>
 
             <input
@@ -143,9 +187,11 @@ export default function UploadRecording() {
               value={sessionDate}
               onChange={(e) => setSessionDate(e.target.value)}
             />
+
           </div>
 
           <div className="ur-field">
+
             <label className="ur-label">Timing</label>
 
             <input
@@ -155,6 +201,7 @@ export default function UploadRecording() {
               value={timing}
               onChange={(e) => setTiming(e.target.value)}
             />
+
           </div>
 
           <input
@@ -166,13 +213,17 @@ export default function UploadRecording() {
           />
 
           {videoFile && (
-            <span className="ur-file-name">{videoFile.name}</span>
+            <span className="ur-file-name">
+              {videoFile.name}
+            </span>
           )}
 
           {uploadProgress > 0 && (
+
             <div className="upload-progress">
               Uploading: {uploadProgress}%
             </div>
+
           )}
 
           <button
@@ -185,12 +236,15 @@ export default function UploadRecording() {
           <button
             className="ur-upload-btn"
             onClick={handleUpload}
+            disabled={uploading}
           >
-            Upload
+            {uploading ? "Uploading..." : "Upload"}
           </button>
 
         </div>
+
       </div>
+
     </div>
   );
 }
