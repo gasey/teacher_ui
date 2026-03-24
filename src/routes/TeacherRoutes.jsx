@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 
 import TeacherLayout from "../layout/TeacherLayout";
-import TeacherDashboard from "../pages/teacherDashboard";
+import TeacherDashboard from "../pages/TeacherDashboard";
 import ClassesList from "../pages/ClassesList";
 import Classes from "../pages/Classes";
 import TeacherLiveSession from "../pages/TeacherLiveSession";
