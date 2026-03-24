@@ -77,8 +77,7 @@ export default function QuizView() {
           </h3>
 
           <p className="qv-teacher-info">
-  👤 {quiz.created_by?.name || "Unknown"}
-  <br />
+  👤 {quiz.teacher_name || "Unknown"}
   📅 {quiz.created_at
     ? new Date(quiz.created_at).toLocaleDateString()
     : "-"}
