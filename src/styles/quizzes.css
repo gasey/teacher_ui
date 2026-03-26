@@ -215,7 +215,6 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  margin-left: 16px;
   flex-shrink: 0;
 }
 
@@ -281,4 +280,23 @@
   .quiz-detail p {
     margin: 0;
   }
+}
+/* Fixed-width action column — prevents row shifting on publish */
+.quiz-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+  justify-content: flex-end;
+}
+
+.quiz-published-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  height: 36px;
+  color: green;
+  font-weight: 600;
+  font-size: 14px;
 }
