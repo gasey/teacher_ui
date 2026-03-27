@@ -30,12 +30,27 @@ export default function QuizView() {
     fetchQuiz();
   }, [quizId]);
 
+  // ✅ UPDATED: handles both letter answers ("a","b") and full text answers
   const getAnswerText = (q) => {
-    const answerIndex = optionLabels.indexOf(q.answer?.toLowerCase());
+    const answer = q.answer?.toLowerCase().trim();
+
+    // If answer is "a", "b", "c", "d" — map to option index
+    const answerIndex = optionLabels.indexOf(answer);
     if (answerIndex >= 0 && q.options?.[answerIndex]) {
-      return q.options[answerIndex].text || q.options[answerIndex];
+      const opt = q.options[answerIndex];
+      return (opt.text || opt).trim();
     }
-    return q.answer || "";
+
+    // If answer is already the full option text
+    if (q.options) {
+      const match = q.options.find((opt) => {
+        const optText = (opt.text || opt).toLowerCase().trim();
+        return optText === answer;
+      });
+      if (match) return (match.text || match).trim();
+    }
+
+    return q.answer?.trim() || "";
   };
 
   const toggleReveal = (idx) =>
@@ -126,8 +141,9 @@ export default function QuizView() {
 
                   <div className="qv-options-row">
                     {(q.options || q.choices || []).map((opt, optIndex) => {
-                      const optText = opt.text || opt;
-                      const isAnswer = optText === answerText;
+                      const optText = (opt.text || opt).trim();
+                      // ✅ UPDATED: case-insensitive comparison
+                      const isAnswer = optText.toLowerCase() === answerText.toLowerCase();
                       return (
                         <label
                           className={`qv-option ${isOpen && isAnswer ? "qv-option-answer" : ""}`}
