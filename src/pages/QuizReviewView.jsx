@@ -12,7 +12,6 @@ export default function QuizReviewView() {
 
   const [data, setData] = useState(null);
   const [search, setSearch] = useState("");
-  const [revealed, setRevealed] = useState({});
 
   useEffect(() => {
     async function fetchReview() {
@@ -25,9 +24,6 @@ export default function QuizReviewView() {
     }
     fetchReview();
   }, [attemptId]);
-
-  const toggleReveal = (idx) =>
-    setRevealed((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
   if (!data) {
     return <div className="qrv-loading">Loading review...</div>;
@@ -93,7 +89,6 @@ export default function QuizReviewView() {
           <div className="qrv-questions-list">
             {filtered.map((q, qIndex) => {
               const isCorrect = q.selected === q.correct;
-              const isOpen = !!revealed[qIndex];
 
               return (
                 <div
@@ -142,25 +137,7 @@ export default function QuizReviewView() {
                       <IoCheckmarkCircle />
                       <span>Correct answer: <strong>{q.correct}</strong></span>
                     </div>
-                    {!isCorrect && (
-                      <button
-                        className="qrv-explain-btn"
-                        onClick={() => toggleReveal(qIndex)}
-                      >
-                        {isOpen ? "Hide hint" : "Why?"}
-                      </button>
-                    )}
                   </div>
-
-                  {isOpen && !isCorrect && (
-                    <div className="qrv-hint-box">
-                      You selected <strong>{q.selected || "nothing"}</strong>, but
-                      the correct answer is <strong>{q.correct}</strong>.
-                      {q.explanation && (
-                        <span> {q.explanation}</span>
-                      )}
-                    </div>
-                  )}
                 </div>
               );
             })}
