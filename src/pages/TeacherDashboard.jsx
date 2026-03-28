@@ -30,6 +30,7 @@ export default function TeacherDashboard() {
   const fetchDashboard = async () => {
     try {
       const res = await api.get("/dashboard/");
+      console.log("Dashboard data:", res.data); // 🔥 debug
       setData(res.data);
     } catch (err) {
       console.error("Dashboard error:", err);
@@ -49,10 +50,18 @@ export default function TeacherDashboard() {
 
   if (loading) return <div className="dashboard">Loading...</div>;
 
-  const sessions = data?.sessions || [];
-  const assignments = data?.assignments || [];
-  const quizzes = data?.quizzes || [];
-  const notifications = data?.notifications || [];
+  // ✅ Safe fallback
+  const sessions = data?.sessions ?? [];
+  const assignments = data?.assignments ?? [];
+  const quizzes = data?.quizzes ?? [];
+  const notifications = data?.notifications ?? [];
+
+  // ✅ Empty state
+  const isAllEmpty =
+    sessions.length === 0 &&
+    assignments.length === 0 &&
+    quizzes.length === 0 &&
+    notifications.length === 0;
 
   const toggleFilter = (current, value, setter) => {
     setter(current === value ? null : value);
@@ -78,6 +87,17 @@ export default function TeacherDashboard() {
     (item) => activityFilter === "all" || item.type === activityFilter
   );
 
+  // 🔥 EMPTY UI
+  if (isAllEmpty) {
+    return (
+      <div className="dashboard">
+        <div className="dash-empty">
+          No data available yet.
+        </div>
+      </div>
+    );
+  }
+
   // ---------------- MOBILE ----------------
   if (isMobile) {
     return (
@@ -86,12 +106,12 @@ export default function TeacherDashboard() {
         {active === "sessions" && (
           <div className="dash-card">
             <h4>Upcoming Live Sessions</h4>
+            {sessions.length === 0 && <p>No sessions</p>}
             {sessions.map((s) => (
               <LiveSessionCard
                 key={s.id}
                 subject={s.subject}
                 topic={s.topic}
-                startsIn=""
                 timing={new Date(s.dateTime).toLocaleString()}
               />
             ))}
@@ -101,6 +121,7 @@ export default function TeacherDashboard() {
         {active === "assignments" && (
           <div className="dash-card">
             <h4>Assignments</h4>
+            {filteredAssignments.length === 0 && <p>No assignments</p>}
             {filteredAssignments.map((a) => (
               <AssignmentItem
                 key={a.id}
@@ -115,6 +136,7 @@ export default function TeacherDashboard() {
         {active === "quizzes" && (
           <div className="dash-card">
             <h4>Quiz</h4>
+            {filteredQuizzes.length === 0 && <p>No quizzes</p>}
             {filteredQuizzes.map((q) => (
               <QuizItem
                 key={q.id}
@@ -129,6 +151,7 @@ export default function TeacherDashboard() {
         {active === "notifications" && (
           <div className="dash-card">
             <h4>Notifications</h4>
+            {filteredActivities.length === 0 && <p>No notifications</p>}
             {filteredActivities.map((item) => (
               <ActivityItem
                 key={item.id}
@@ -153,12 +176,12 @@ export default function TeacherDashboard() {
         <div className="dash-live-section">
           <h3>Upcoming Live Sessions</h3>
           <div className="dash-live-row">
+            {sessions.length === 0 && <p>No sessions</p>}
             {sessions.map((s) => (
               <LiveSessionCard
                 key={s.id}
                 subject={s.subject}
                 topic={s.topic}
-                startsIn=""
                 timing={new Date(s.dateTime).toLocaleString()}
               />
             ))}
@@ -172,6 +195,7 @@ export default function TeacherDashboard() {
 
         <div className="dash-card">
           <h4>Assignments</h4>
+          {filteredAssignments.length === 0 && <p>No assignments</p>}
           {filteredAssignments.map((a) => (
             <AssignmentItem
               key={a.id}
@@ -184,6 +208,7 @@ export default function TeacherDashboard() {
 
         <div className="dash-card">
           <h4>Quiz</h4>
+          {filteredQuizzes.length === 0 && <p>No quizzes</p>}
           {filteredQuizzes.map((q) => (
             <QuizItem
               key={q.id}
@@ -196,6 +221,7 @@ export default function TeacherDashboard() {
 
         <div className="dash-card">
           <h4>Notifications</h4>
+          {filteredActivities.length === 0 && <p>No notifications</p>}
           {filteredActivities.map((item) => (
             <ActivityItem
               key={item.id}
