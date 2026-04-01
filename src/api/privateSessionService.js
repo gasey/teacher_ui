@@ -1,122 +1,92 @@
+import api from "./apiClient";
+
 /**
  * Private Session API Service — Teacher UI
- *
- * All methods hit the real backend. No mock data.
- * LiveKit tokens come from /api/private-sessions/<id>/join/
- * which reuses the existing livestream token generator.
+ * Uses shared authenticated api client.
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://api.shikshacom.com";
-
-function authHeaders() {
-  const token = localStorage.getItem("access_token");
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
-
-async function request(method, path, body = null) {
-  const opts = { method, headers: authHeaders() };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(`${API_BASE}${path}`, opts);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error || err.detail || `Request failed (${res.status})`);
-  }
-  return res.json();
-}
-
-// ──────────────────────────────────────────────
-// Teacher session lists
-// ──────────────────────────────────────────────
-
-/** Approved + ongoing sessions */
+/* Teacher session lists */
 export async function getSessions() {
-  return request("GET", "/api/private-sessions/teacher/sessions/");
+  const res = await api.get("/private-sessions/teacher/sessions/");
+  return res.data;
 }
 
-/** Pending student requests */
 export async function getRequests() {
-  return request("GET", "/api/private-sessions/teacher/requests/");
+  const res = await api.get("/private-sessions/teacher/requests/");
+  return res.data;
 }
 
-/** Completed / cancelled / declined history */
 export async function getHistory() {
-  return request("GET", "/api/private-sessions/teacher/history/");
+  const res = await api.get("/private-sessions/teacher/history/");
+  return res.data;
 }
 
-// ──────────────────────────────────────────────
-// Session detail
-// ──────────────────────────────────────────────
-
+/* Session detail */
 export async function getSessionDetail(sessionId) {
-  return request("GET", `/api/private-sessions/${sessionId}/`);
+  const res = await api.get(`/private-sessions/${sessionId}/`);
+  return res.data;
 }
 
-// ──────────────────────────────────────────────
-// Teacher actions on requests
-// ──────────────────────────────────────────────
-
+/* Teacher actions on requests */
 export async function acceptRequest(sessionId, data = {}) {
-  return request("POST", `/api/private-sessions/${sessionId}/accept/`, data);
+  const res = await api.post(`/private-sessions/${sessionId}/accept/`, data);
+  return res.data;
 }
 
 export async function declineRequest(sessionId, reason = "") {
-  return request("POST", `/api/private-sessions/${sessionId}/decline/`, { reason });
+  const res = await api.post(`/private-sessions/${sessionId}/decline/`, { reason });
+  return res.data;
 }
 
 export async function rescheduleRequest(sessionId, data) {
-  return request("POST", `/api/private-sessions/${sessionId}/reschedule/`, data);
+  const res = await api.post(`/private-sessions/${sessionId}/reschedule/`, data);
+  return res.data;
 }
 
-// ──────────────────────────────────────────────
-// Session lifecycle
-// ──────────────────────────────────────────────
-
+/* Session lifecycle */
 export async function startSession(sessionId) {
-  return request("POST", `/api/private-sessions/${sessionId}/start/`);
+  const res = await api.post(`/private-sessions/${sessionId}/start/`);
+  return res.data;
 }
 
 export async function endSession(sessionId) {
-  return request("POST", `/api/private-sessions/${sessionId}/end/`);
+  const res = await api.post(`/private-sessions/${sessionId}/end/`);
+  return res.data;
 }
 
 export async function cancelSession(sessionId, reason = "") {
-  return request("POST", `/api/private-sessions/${sessionId}/cancel/`, { reason });
+  const res = await api.post(`/private-sessions/${sessionId}/cancel/`, { reason });
+  return res.data;
 }
 
-// ──────────────────────────────────────────────
-// LiveKit — reuses existing livestream token infra
-// ──────────────────────────────────────────────
-
-/**
- * Get a LiveKit join token for this private session.
- * Returns { livekit_url, token, room, role }
- * Same response shape as the regular livestream join endpoint.
- */
+/* LiveKit */
 export async function getLiveKitToken(sessionId) {
-  return request("POST", `/api/private-sessions/${sessionId}/join/`);
+  const res = await api.post(`/private-sessions/${sessionId}/join/`);
+  return res.data;
 }
 
-// ──────────────────────────────────────────────
-// Availability (placeholder — backend not yet built)
-// ──────────────────────────────────────────────
-
+/* Availability */
 export async function getAvailability() {
   try {
-    return await request("GET", "/api/private-sessions/teacher/availability/");
+    const res = await api.get("/private-sessions/teacher/availability/");
+    return res.data;
   } catch {
     return {
-      monday: [], tuesday: [], wednesday: [], thursday: [],
-      friday: [], saturday: [], sunday: [],
+      monday: [],
+      tuesday: [],
+      wednesday: [],
+      thursday: [],
+      friday: [],
+      saturday: [],
+      sunday: [],
     };
   }
 }
 
 export async function saveAvailability(availability) {
   try {
-    return await request("POST", "/api/private-sessions/teacher/availability/", availability);
+    const res = await api.post("/private-sessions/teacher/availability/", availability);
+    return res.data;
   } catch {
     console.warn("Availability endpoint not available yet.");
     return availability;
