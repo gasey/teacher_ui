@@ -239,7 +239,9 @@ export default function UploadMaterial() {
           {/* RIGHT */}
           <div className="um-upload-panel">
 
-            <div className="um-upload-title">Upload File</div>
+            <div className="um-upload-title">
+              Upload File ({fileItems.filter(f => f.status === "done").length})
+            </div>
 
             <input
               type="file"
