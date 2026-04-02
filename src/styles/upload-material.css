@@ -1,16 +1,14 @@
-/* ✅ GLOBAL BACKGROUND */
+/* ✅ GLOBAL BACKGROUND (FIGMA MATCH) */
 body {
-  background: #e9eef3;
+  background: rgba(200, 208, 220, 1);
 }
 
-/* PAGE WRAPPER */
+/* PAGE WRAPPER (REMOVE EXTRA WHITE FEEL) */
 .upload-material-page {
   display: flex;
   flex-direction: column;
   gap: 12px;
   height: 100%;
-  background: #f5f7fa;
-  border-radius: 18px;
   padding: 16px;
 }
 
@@ -32,12 +30,9 @@ body {
 
 /* HEADER */
 .um-header {
-  background: #f0f4f8;
+  background: #e9edf2;
   border-radius: 14px;
   padding: 18px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .um-title {
@@ -63,15 +58,15 @@ body {
   background: #3f5670;
 }
 
-/* ✅ FOR BOTTOM POSITION */
-.um-save-bottom {
-  margin-top: auto;
+/* ✅ SAVE BUTTON OUTSIDE */
+.um-save-outside {
+  margin-top: 10px;
   align-self: flex-end;
 }
 
 /* CONTAINER */
 .um-form-container {
-  background: #f0f4f8;
+  background: #e9edf2;
   border-radius: 16px;
   padding: 30px;
   flex: 1;
@@ -82,7 +77,7 @@ body {
 
 /* CARD */
 .um-form-card {
-  background: #eae4db;
+  background: #dcd5c9;
   border-radius: 12px;
   padding: 36px 48px;
   width: 100%;
@@ -100,14 +95,15 @@ body {
   gap: 20px;
 }
 
-/* ✅ FIX: LABEL ABOVE INPUT */
+/* ✅ INLINE LIKE FIGMA */
 .um-field {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 16px;
 }
 
 .um-label {
+  width: 80px;
   font-size: 13px;
   font-weight: 600;
   color: #1f2d3d;
@@ -115,11 +111,10 @@ body {
 
 /* INPUT */
 .um-input {
-  width: 100%;
-  padding: 8px 10px;
+  flex: 1;
+  padding: 6px;
   border: none;
-  border-bottom: 1px solid #999;
-  font-size: 14px;
+  border-bottom: 1px solid #888;
   background: transparent;
   outline: none;
 }
@@ -130,23 +125,22 @@ body {
 
 /* TEXTAREA */
 textarea.um-input {
-  border: 1px solid #ccc;
+  border: 1px solid #bbb;
   border-radius: 6px;
   padding: 10px;
   height: 70px;
   resize: none;
 }
 
-/* CUSTOM BUTTON */
+/* CUSTOM BUTTON INLINE */
 .um-custom-btn {
   background: #4b6482;
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
-  width: fit-content;
 }
 
 .um-custom-btn:hover {
@@ -155,14 +149,14 @@ textarea.um-input {
 
 /* RIGHT PANEL */
 .um-upload-panel {
-  width: 340px;
+  width: 320px;
   background: #5a6f8d;
   border-radius: 12px;
   padding: 20px;
   color: white;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   min-height: 420px;
 }
 
@@ -177,7 +171,7 @@ textarea.um-input {
   color: white;
   border: 2px dashed rgba(255, 255, 255, 0.5);
   border-radius: 10px;
-  padding: 28px;
+  padding: 24px;
   font-size: 13px;
   cursor: pointer;
   text-align: center;
