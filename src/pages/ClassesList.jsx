@@ -11,6 +11,18 @@ export default function ClassesList() {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const pickMetaValue = (item, keys = []) => {
+    for (const key of keys) {
+      const value = item?.[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+      if (value && typeof value === "object") {
+        const nested = value.name || value.title || value.label || value.value;
+        if (typeof nested === "string" && nested.trim()) return nested.trim();
+      }
+    }
+    return "";
+  };
+
   useEffect(() => {
     async function fetchSubjects() {
       try {
@@ -22,7 +34,9 @@ export default function ClassesList() {
         const normalized = res.data.map((s) => ({
           subjectId: s.subject_id || s.id,
           subjectName: s.subject_name || s.name,
-          courseTitle: s.course_title || "",
+          courseTitle: pickMetaValue(s, ["course_title", "course", "class_name"]),
+          board: pickMetaValue(s, ["board", "board_name", "board_title"]),
+          stream: pickMetaValue(s, ["stream", "stream_name", "stream_title"]),
         }));
 
         setSubjects(normalized);
@@ -39,6 +53,11 @@ export default function ClassesList() {
   }, []);
 
   if (loading) return <div>Loading classes...</div>;
+
+  const getClassMeta = (subject) =>
+    [subject.courseTitle, subject.board, subject.stream]
+      .filter(Boolean)
+      .join(" • ");
 
   return (
     <div className="cl-wrapper">
@@ -66,7 +85,6 @@ export default function ClassesList() {
           )}
 
           {subjects.map((subject) => (
-
             <div
               className="cl-card"
               key={subject.subjectId}
@@ -84,7 +102,7 @@ export default function ClassesList() {
               <div className="cl-card-right">
 
                 <span className="cl-card-label">
-                  {subject.courseTitle}
+                  {getClassMeta(subject)}
                 </span>
 
               </div>

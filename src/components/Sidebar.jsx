@@ -26,6 +26,30 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
     fetchClasses();
   }, []);
 
+  const pickMetaValue = (item, keys = []) => {
+    for (const key of keys) {
+      const value = item?.[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+      if (value && typeof value === "object") {
+        const nested = value.name || value.title || value.label || value.value;
+        if (typeof nested === "string" && nested.trim()) return nested.trim();
+      }
+    }
+    return "";
+  };
+
+  const getClassMeta = (cls) => {
+    const course = pickMetaValue(cls, ["course_title", "course", "class_name"]);
+    const board = pickMetaValue(cls, ["board", "board_name", "board_title"]);
+    const stream = pickMetaValue(cls, ["stream", "stream_name", "stream_title"]);
+
+    const meta = [course, board, stream]
+      .filter(Boolean)
+      .join(" • ");
+
+    return meta ? ` (${meta})` : "";
+  };
+
   return (
     <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
       <div className="sidebar-top">
@@ -88,7 +112,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 setSidebarOpen(false);
               }}
             >
-              {cls.subject_name} ({cls.course_title})
+              {cls.subject_name}
+              {getClassMeta(cls)}
             </p>
           ))}
         </div>
