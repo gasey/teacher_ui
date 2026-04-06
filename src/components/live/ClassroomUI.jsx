@@ -9,7 +9,7 @@ import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 import { IoChatbubblesOutline } from "react-icons/io5";
 
 export default function ClassroomUI({ role }) {
-  const isPresenter = role === "PRESENTER"; // 🔥 FIX
+  const isPresenter = role === "PRESENTER";
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -19,7 +19,7 @@ export default function ClassroomUI({ role }) {
   const room = useRoomContext();
 
   /* =====================================
-     🔥 RAISE HAND LISTENER (PRESENTER ONLY)
+     🔥 RAISE / LOWER HAND LISTENER
   ===================================== */
   useEffect(() => {
     if (!isPresenter) return;
@@ -28,27 +28,32 @@ export default function ClassroomUI({ role }) {
       try {
         const text = new TextDecoder().decode(payload);
         const msg = JSON.parse(text);
-        if (msg.type !== "raise-hand") return;
 
         const identity = participant.identity;
-        const toastId = Date.now() + Math.random();
 
-        setRaiseHandToasts((prev) => [...prev, { id: toastId, identity }]);
+        // ✅ FIX: lowercase to match RaiseHandButton
+        if (msg.type === "raise-hand") {
+          setRaisedHands((prev) => ({ ...prev, [identity]: true }));
 
-        setTimeout(
-          () => setRaiseHandToasts((prev) => prev.filter((t) => t.id !== toastId)),
-          5000
-        );
+          const toastId = Date.now() + Math.random();
+          setRaiseHandToasts((prev) => [...prev, { id: toastId, identity }]);
+          setTimeout(
+            () =>
+              setRaiseHandToasts((prev) =>
+                prev.filter((t) => t.id !== toastId)
+              ),
+            5000
+          );
+        }
 
-        setRaisedHands((prev) => ({ ...prev, [identity]: true }));
-
-        setTimeout(() => {
+        // ✅ FIX: clear hand when student lowers it — no auto-timeout
+        if (msg.type === "lower-hand") {
           setRaisedHands((prev) => {
             const updated = { ...prev };
             delete updated[identity];
             return updated;
           });
-        }, 15000);
+        }
       } catch {}
     };
 
@@ -125,17 +130,14 @@ export default function ClassroomUI({ role }) {
       <div className={`main-stage${!sidebarOpen ? " full-width" : ""}`}>
         <VideoTrack trackRef={mainTrack} />
 
-        {/* PiP */}
         {pipTrack && (
           <div className="pip-camera">
             <VideoTrack trackRef={pipTrack} />
           </div>
         )}
 
-        {/* 🔥 FIX: SHOW CONTROLS ONLY FOR PRESENTER */}
         {isPresenter && <TeacherControls />}
 
-        {/* Overlay buttons */}
         <div className="video-overlay-actions">
           <button
             className="ov-btn"
@@ -145,7 +147,11 @@ export default function ClassroomUI({ role }) {
           </button>
 
           <button className="ov-btn" onClick={toggleFullscreen}>
-            {isFullscreen ? <MdFullscreenExit size={19} /> : <MdFullscreen size={19} />}
+            {isFullscreen ? (
+              <MdFullscreenExit size={19} />
+            ) : (
+              <MdFullscreen size={19} />
+            )}
           </button>
         </div>
       </div>
